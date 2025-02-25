@@ -33,6 +33,9 @@ jobs:
           git commit -m "🔄 Auto-conversion des liens et callouts Obsidian" || echo "Pas de changements à committer"
           git push
 
+      - name: 📂 Vérifier si le dossier `output/` existe
+        run: ls -la output/ || echo "⚠️ Le dossier output/ est vide ou inexistant !"
+
       - name: 📤 Déployer sur GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
