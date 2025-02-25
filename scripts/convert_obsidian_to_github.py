@@ -79,6 +79,7 @@ def copier_notes(dossier_entree, dossier_sortie):
     """ Copie tous les fichiers Markdown en conservant l'arborescence et applique la conversion """
     if os.path.exists(dossier_sortie):
         shutil.rmtree(dossier_sortie)  # Supprime l'ancien dossier output pour tout recréer
+    os.makedirs(dossier_sortie, exist_ok=True)
 
     for racine, _, fichiers in os.walk(dossier_entree):
         for fichier in fichiers:
