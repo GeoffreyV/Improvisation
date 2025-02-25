@@ -1,0 +1,1 @@
+A chaque phrase prononcé, l'enjeu doit être mis en valeur 
