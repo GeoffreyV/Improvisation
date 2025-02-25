@@ -3,7 +3,7 @@ name: Convert Obsidian to GitHub Pages
 on:
   push:
     branches:
-      - main  # Exécute le script sur la branche principale (modifie si besoin)
+      - main  # Exécute le script à chaque push sur `main`
   pull_request:
 
 jobs:
@@ -25,19 +25,17 @@ jobs:
         run: |
           python scripts/convert_obsidian_to_github.py
 
-      - name: 🚀 Commiter les modifications
+      - name: 📂 Vérifier le contenu de `output/`
+        run: ls -la output/ || echo "⚠️ ERREUR : Le dossier output/ est vide ou inexistant !"
+
+      - name: 🚀 Déployer sur la branche `gh-pages`
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add output/
-          git commit -m "🔄 Auto-conversion des liens et callouts Obsidian" || echo "Pas de changements à committer"
-          git push
-
-      - name: 📂 Vérifier si le dossier `output/` existe
-        run: ls -la output/ || echo "⚠️ Le dossier output/ est vide ou inexistant !"
-
-      - name: 📤 Déployer sur GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          branch: gh-pages  # Branche où sera publié le site
-          folder: output  # Utiliser le dossier output pour GitHub Pages
+          git fetch origin gh-pages || git checkout --orphan gh-pages
+          git checkout gh-pages
+          git rm -rf . # Supprime tous les fichiers existants (hors .git)
+          cp -r output/* . # Copie le contenu de `output/` à la racine
+          git add .
+          git commit -m "🔄 Mise à jour automatique des pages GitHub" || echo "⚠️ Pas de changements à committer"
+          git push origin gh-pages --force
