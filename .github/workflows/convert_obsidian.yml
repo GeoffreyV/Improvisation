@@ -26,16 +26,26 @@ jobs:
           python scripts/convert_obsidian_to_github.py
 
       - name: 📂 Vérifier le contenu de `output/`
-        run: ls -la output/ || echo "⚠️ ERREUR : Le dossier output/ est vide ou inexistant !"
+        run: |
+          if [ -d "output" ]; then
+            ls -la output/
+          else
+            echo "⚠️ ERREUR : Le dossier output/ est vide ou inexistant !" && exit 1
+          fi
 
       - name: 🚀 Déployer sur la branche `gh-pages`
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Vérifier si la branche gh-pages existe, sinon la créer
           git fetch origin gh-pages || git checkout --orphan gh-pages
           git checkout gh-pages
-          git rm -rf . # Supprime tous les fichiers existants (hors .git)
-          cp -r output/* . # Copie le contenu de `output/` à la racine
+
+          # Nettoyer et copier les nouveaux fichiers depuis output/
+          rm -rf *  # Supprime tous les fichiers sauf .git
+          cp -r output/* . || echo "⚠️ ERREUR : Échec de la copie des fichiers !"
+
           git add .
           git commit -m "🔄 Mise à jour automatique des pages GitHub" || echo "⚠️ Pas de changements à committer"
-          git push origin gh-pages --force
+          git push origin gh-pages --force || echo "⚠️ ERREUR : Échec du push !"
