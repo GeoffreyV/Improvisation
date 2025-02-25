@@ -1,0 +1,40 @@
+name: Convert Obsidian to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main  # Exécute le script sur la branche principale (modifie si besoin)
+  pull_request:
+
+jobs:
+  convert-links:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Cloner le dépôt
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: 🔧 Configurer Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: 📜 Exécuter le script de conversion
+        run: |
+          python scripts/convert_obsidian_to_github.py
+
+      - name: 🚀 Commiter les modifications
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add output/
+          git commit -m "🔄 Auto-conversion des liens et callouts Obsidian" || echo "Pas de changements à committer"
+          git push
+
+      - name: 📤 Déployer sur GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages  # Branche où sera publié le site
+          folder: output  # Utiliser le dossier output pour GitHub Pages
