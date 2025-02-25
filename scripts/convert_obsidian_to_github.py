@@ -4,7 +4,7 @@ import shutil
 import urllib.parse  # Pour encoder correctement les noms de fichiers dans les liens
 
 # Dossiers d'entrée (Obsidian) et de sortie (GitHub Pages)
-DOSSIER_ORIGINAL = "notes"  # Dossier où sont tes notes pour Obsidian
+DOSSIER_ORIGINAL = "."  # Dossier où sont tes notes pour Obsidian
 DOSSIER_GITHUB = "output"  # Dossier où seront stockées les versions modifiées
 
 # Expressions régulières pour détecter les liens Obsidian
@@ -24,19 +24,19 @@ CALLOUT_MAPPING = {
     "info": "callout-info"
 }
 
-def normaliser_nom_fichier(nom):
+def normaliser_espaces_nom_fichiers(nom):
     """
     Transforme 'Nom de la Note' en 'Nom-de-la-Note.md'
     et encode les caractères spéciaux pour les liens Markdown.
     """
     nom_sans_espace = nom.replace(" ", "-")  # Remplace les espaces par des tirets
-    nom_nettoye = re.sub(r"[^\w\-]", "", nom_sans_espace)  # Supprime les caractères spéciaux
-    return nom_nettoye + ".md"
+    # nom_nettoye = re.sub(r"[^\w\-]", "", nom_sans_espace)  # Supprime les caractères spéciaux
+    return nom_sans_espace
 
 def convertir_liens_obsidian(texte):
     """ Remplace [[Nom de la Note]] par [Nom de la Note](Nom-de-la-Note.md) """
-    texte = LIEN_OBSIDIAN.sub(lambda match: f"[{match.group(1)}]({urllib.parse.quote(normaliser_nom_fichier(match.group(1)))})", texte)
-    texte = APERCU_OBSIDIAN.sub(lambda match: f"{{% include_relative {normaliser_nom_fichier(match.group(1))} %}}", texte)
+    texte = LIEN_OBSIDIAN.sub(lambda match: f"[{match.group(1)}]({urllib.parse.quote(normaliser_espaces_nom_fichiers(match.group(1)))})", texte)
+    texte = APERCU_OBSIDIAN.sub(lambda match: f"{{% include_relative {normaliser_espaces_nom_fichiers(match.group(1))} %}}", texte)
     return texte
 
 def convertir_callouts(texte):
@@ -66,7 +66,8 @@ def traiter_fichier(chemin_fichier, dossier_sortie):
     contenu_converti = convertir_callouts(contenu_converti)
 
     # Définir le chemin de sortie
-    chemin_sortie = chemin_fichier.replace(DOSSIER_ORIGINAL, dossier_sortie, 1)
+    chemin_normalise = normaliser_espaces_nom_fichiers(chemin_fichier)
+    chemin_sortie = chemin_normalise.replace(DOSSIER_ORIGINAL, dossier_sortie, 1)
     os.makedirs(os.path.dirname(chemin_sortie), exist_ok=True)
 
     # Écrire le fichier converti
@@ -82,6 +83,9 @@ def copier_notes(dossier_entree, dossier_sortie):
     os.makedirs(dossier_sortie, exist_ok=True)
 
     for racine, _, fichiers in os.walk(dossier_entree):
+        if dossier_sortie in racine:
+            continue
+
         for fichier in fichiers:
             print(f"📄 Copie : {fichier}")
             if fichier.endswith(".md"):
