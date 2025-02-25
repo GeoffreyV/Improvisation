@@ -42,8 +42,10 @@ jobs:
           git fetch origin gh-pages || git checkout --orphan gh-pages
           git checkout gh-pages
 
-          # Nettoyer et copier les nouveaux fichiers depuis output/
-          rm -rf *  # Supprime tous les fichiers sauf .git
+          # Supprimer tous les fichiers SAUF output/ et .git
+          find . -mindepth 1 ! -name '.git' ! -name 'output' -exec rm -rf {} +
+
+          # Copier le contenu de output/ à la racine
           cp -r output/* . || echo "⚠️ ERREUR : Échec de la copie des fichiers !"
 
           git add .
