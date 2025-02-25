@@ -1,1 +1,0 @@
-Ce dossier est à destination de githubPages
