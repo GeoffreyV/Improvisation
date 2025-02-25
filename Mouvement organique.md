@@ -1,1 +1,0 @@
-En cercle, les participants recopient tous les mouvements qu'ils aperçoient. Sans créer, laisser le mouvement s'amplifier et voir ce qui apparaît.
