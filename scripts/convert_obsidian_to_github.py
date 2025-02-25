@@ -83,7 +83,9 @@ def copier_notes(dossier_entree, dossier_sortie):
 
     for racine, _, fichiers in os.walk(dossier_entree):
         for fichier in fichiers:
+            print(f"📄 Copie : {fichier}")
             if fichier.endswith(".md"):
+                print(f"📄 Traitement : {fichier}")
                 chemin_fichier = os.path.join(racine, fichier)
                 traiter_fichier(chemin_fichier, dossier_sortie)
 
